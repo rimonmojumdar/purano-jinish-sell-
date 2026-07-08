@@ -1,0 +1,6 @@
+{
+  "name": "Old Product Marketplace",
+  "description": "A fully responsive, modern Bengali old-product marketplace featuring authentication, secure listing creation, simulated live-chat, and an admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
