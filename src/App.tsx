@@ -24,7 +24,16 @@ export default function App() {
 
   const [products, setProducts] = React.useState<Product[]>(() => {
     const saved = localStorage.getItem('aponbazar_products');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 30) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
     localStorage.setItem('aponbazar_products', JSON.stringify(INITIAL_PRODUCTS));
     return INITIAL_PRODUCTS;
   });
@@ -893,9 +902,94 @@ export default function App() {
     const isVisible = prod.isApproved || prod.sellerId === currentUser?.id;
     if (!isVisible) return false;
 
-    // Search input match
-    const matchesSearch = prod.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          prod.description.toLowerCase().includes(searchQuery.toLowerCase());
+    // Search input match with category support, synonyms, and translations
+    const q = searchQuery.toLowerCase().trim();
+    let matchesSearch = false;
+    if (!q) {
+      matchesSearch = true;
+    } else {
+      // Create a list of search terms starting with the original query
+      const searchTerms = [q];
+      
+      // Bilingual translation & synonym dictionary
+      const translations: { [key: string]: string[] } = {
+        'iphone': ['আইফোন', 'apple', 'অ্যাপল'],
+        'আইফোন': ['iphone', 'apple', 'অ্যাপল'],
+        'apple': ['আইফোন', 'iphone', 'অ্যাপল'],
+        'samsung': ['স্যামসাং', 'galaxy', 'গ্যালাক্সি'],
+        'স্যামসাং': ['samsung', 'galaxy', 'গ্যালাক্সি'],
+        'galaxy': ['samsung', 'স্যামসাং', 'গ্যালাক্সি'],
+        'redmi': ['রেডমি', 'xiaomi', 'শাওমি', 'শাওমী'],
+        'রেডমি': ['redmi', 'xiaomi', 'শাওমি', 'শাওমী'],
+        'xiaomi': ['redmi', 'রেডমি', 'শাওমি', 'শাওমী'],
+        'শাওমি': ['xiaomi', 'redmi', 'রেডমি', 'শাওমী'],
+        'oneplus': ['ওয়ানপ্লাস', 'ওয়ানপ্লাস', '১+', '1+'],
+        'ওয়ানপ্লাস': ['oneplus', 'ওয়ানপ্লাস'],
+        'ওয়ানপ্লাস': ['oneplus', 'ওয়ানপ্লাস'],
+        'google': ['গুগল', 'pixel', 'পিক্সেল'],
+        'pixel': ['google', 'গুগল', 'পিক্সেল'],
+        'গুগল': ['google', 'pixel', 'পিক্সেল'],
+        'পিক্সেল': ['google', 'pixel', 'গুগল'],
+        'asus': ['আসুস', 'rog', 'রগ'],
+        'আসুস': ['asus', 'rog', 'রগ'],
+        'hp': ['এইচপি', 'ল্যাপটপ', 'laptop'],
+        'এইচপি': ['hp', 'ল্যাপটপ', 'laptop'],
+        'dell': ['ডেল', 'ল্যাপটপ', 'laptop'],
+        'ডেল': ['dell', 'ল্যাপটপ', 'laptop'],
+        'walton': ['ওয়ালটন', 'ওয়ালটন'],
+        'ওয়ালটন': ['walton', 'ওয়ালটন'],
+        'sony': ['সনি', 'সোনি', 'bravia', 'ব্রাভিয়া'],
+        'সনি': ['sony', 'সোনি'],
+        'lg': ['এলজি'],
+        'bike': ['মোটরসাইকেল', 'বাইক', 'পালসার', 'pulsar', 'gixxer', 'জিক্সার', 'fzs'],
+        'motorcycle': ['মোটরসাইকেল', 'বাইক'],
+        'বাইক': ['bike', 'motorcycle', 'মোটরসাইকেল'],
+        'মোটরসাইকেল': ['bike', 'motorcycle', 'বাইক'],
+        'yamaha': ['ইয়ামাহা', 'ইয়ামাহা'],
+        'suzuki': ['সুজুকি'],
+        'tv': ['টিভি', 'টেলিভিশন', 'television'],
+        'টিভি': ['tv', 'television', 'টেলিভিশন'],
+        'টেলিভিশন': ['tv', 'television', 'টিভি'],
+        'fridge': ['ফ্রিজ', 'refrigerator', 'রেফ্রিজারেটর'],
+        'ফ্রিজ': ['fridge', 'refrigerator', 'রেফ্রিজারেটর'],
+        'refrigerator': ['fridge', 'ফ্রিজ'],
+        'sofa': ['সোফা', 'আসবাবপত্র', 'furniture'],
+        'সোফা': ['sofa', 'আসবাবপত্র', 'furniture'],
+        'table': ['টেবিল', 'আসবাবপত্র', 'furniture'],
+        'টেবিল': ['table', 'আসবাবপত্র', 'furniture'],
+        'chair': ['চেয়ার', 'আসবাবপত্র', 'furniture'],
+        'চেয়ার': ['chair', 'আসবাবপত্র', 'furniture'],
+        'bed': ['খাট', 'আসবাবপত্র', 'furniture'],
+        'খাট': ['bed', 'আসবাবপত্র', 'furniture'],
+        'furniture': ['আসবাবপত্র', 'আসবাব'],
+        'আসবাবপত্র': ['furniture', 'sofa', 'table', 'chair', 'bed'],
+        'cycle': ['সাইকেল', 'bicycle', 'বাইসাইকেল'],
+        'সাইকেল': ['cycle', 'bicycle', 'বাইসাইকেল'],
+        'sports': ['খেলাধুলা', 'জিম', 'gym'],
+        'খেলাধুলা': ['sports', 'gym', 'খেলা'],
+      };
+
+      // Check key matching and push synonym terms
+      Object.keys(translations).forEach(key => {
+        if (q.includes(key) || key.includes(q)) {
+          searchTerms.push(...translations[key]);
+        }
+      });
+
+      // Match product if any of the expanded terms match title, description, location, or category
+      matchesSearch = searchTerms.some(term => {
+        const titleMatch = prod.title.toLowerCase().includes(term);
+        const descMatch = prod.description.toLowerCase().includes(term);
+        const locMatch = prod.location.toLowerCase().includes(term);
+        
+        // Find category match
+        const catObj = CATEGORIES.find(c => c.id === prod.category.toLowerCase());
+        const catMatch = prod.category.toLowerCase().includes(term) || 
+                         (catObj && catObj.name.toLowerCase().includes(term));
+
+        return titleMatch || descMatch || locMatch || catMatch;
+      });
+    }
 
     // Category Match
     const matchesCategory = selectedCategory === 'all' || prod.category === selectedCategory;
@@ -935,23 +1029,41 @@ export default function App() {
       
       {/* Floating Simulated SMS Push Notification Banner */}
       {smsNotification && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm bg-gray-900/95 text-white p-4 rounded-3xl shadow-2xl border border-white/10 backdrop-blur-md animate-in fade-in slide-in-from-top-6 duration-300 flex gap-3.5 items-start">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-emerald-500/25 text-emerald-400 flex items-center justify-center text-lg animate-pulse border border-emerald-500/20">
-            💬
-          </div>
-          <div className="flex-grow space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="font-extrabold text-xs tracking-wider text-emerald-400 uppercase">{smsNotification.title}</span>
-              <span className="text-[9px] text-gray-400 font-extrabold">NOW</span>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm bg-gray-900/95 text-white p-4 rounded-3xl shadow-2xl border border-white/10 backdrop-blur-md animate-in fade-in slide-in-from-top-6 duration-300 flex flex-col gap-3">
+          <div className="flex gap-3.5 items-start w-full">
+            <div className="h-10 w-10 shrink-0 rounded-full bg-emerald-500/25 text-emerald-400 flex items-center justify-center text-lg animate-pulse border border-emerald-500/20">
+              💬
             </div>
-            <p className="text-[11px] leading-relaxed font-semibold text-gray-100 select-all">{smsNotification.body}</p>
+            <div className="flex-grow space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="font-extrabold text-xs tracking-wider text-emerald-400 uppercase">{smsNotification.title}</span>
+                <span className="text-[9px] text-gray-400 font-extrabold">NOW</span>
+              </div>
+              <p className="text-[11px] leading-relaxed font-semibold text-gray-100 select-all">{smsNotification.body}</p>
+            </div>
+            <button 
+              onClick={() => setSmsNotification(null)}
+              className="text-gray-400 hover:text-white shrink-0 p-1 rounded-full hover:bg-white/10 cursor-pointer active:scale-95"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
-          <button 
-            onClick={() => setSmsNotification(null)}
-            className="text-gray-400 hover:text-white shrink-0 p-1 rounded-full hover:bg-white/10 cursor-pointer active:scale-95"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
+
+          {/* Action button inside simulated SMS if we are in payment OTP step */}
+          {paymentStep === 'otp' && systemOtpCode && (
+            <div className="flex justify-end gap-2 border-t border-white/10 pt-2.5 w-full">
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpInput(systemOtpCode);
+                  setSmsNotification(null);
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black py-1.5 rounded-xl transition-all cursor-pointer shadow-xs active:scale-95 text-center"
+              >
+                ⚡ ওটিপি অটো-ফিল করুন (Auto Fill OTP)
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -1350,8 +1462,28 @@ export default function App() {
                         className="w-full text-center tracking-[0.3em] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 py-3.5 text-sm font-black text-gray-800 focus:border-emerald-500 focus:outline-hidden dark:text-white"
                         required
                       />
-                      <p className="text-[9px] text-gray-400 font-bold text-center mt-2">
-                        উপরের এসএমএস নোটিফিকেশন থেকে ওটিপি কোডটি দেখে টাইপ করুন।
+                      
+                      {/* Interactive Simulated OTP helper card */}
+                      <div className="mt-3.5 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400">
+                          মোবাইলে প্রেরিত সিমুলেশন ওটিপি:
+                        </div>
+                        <div className="inline-flex items-center gap-1.5 font-black text-lg text-gray-900 dark:text-white tracking-widest bg-white dark:bg-gray-900 px-3 py-1 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xs">
+                          {systemOtpCode}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOtpInput(systemOtpCode);
+                          }}
+                          className="w-full block rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-[10px] py-1.5 transition-colors cursor-pointer active:scale-95"
+                        >
+                          ⚡ ওটিপি অটো-ফিল করুন (Auto Fill OTP)
+                        </button>
+                      </div>
+
+                      <p className="text-[9px] text-gray-400 font-bold text-center mt-2.5">
+                        সিমুলেশন ওটিপি দেখে টাইপ করতে পারেন অথবা এক ক্লিকে অটো-ফিল করতে পারেন।
                       </p>
                     </div>
 
@@ -1584,7 +1716,12 @@ export default function App() {
                     <input 
                       type="text" 
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (e.target.value.trim() !== '') {
+                          setSelectedCategory('all');
+                        }
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           handleAddSearchHistory(searchQuery);
@@ -1636,6 +1773,7 @@ export default function App() {
                         key={idx}
                         onClick={() => {
                           setSearchQuery(hQuery);
+                          setSelectedCategory('all');
                         }}
                         className="rounded-full bg-white/10 hover:bg-white/20 hover:text-white px-3 py-1 text-[11px] font-semibold text-emerald-100 cursor-pointer transition-all active:scale-95 flex items-center gap-1 border border-white/5 animate-in fade-in zoom-in-95"
                       >
@@ -1780,7 +1918,7 @@ export default function App() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                   {sortedProducts.map((prod) => (
                     <ProductCard 
                       key={prod.id} 

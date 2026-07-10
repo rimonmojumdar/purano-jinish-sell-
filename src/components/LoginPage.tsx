@@ -13,8 +13,8 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
   const [otpCode, setOtpCode] = React.useState(['', '', '', '', '', '']);
   const [timer, setTimer] = React.useState(60);
   const [errorMsg, setErrorMsg] = React.useState('');
-  const [googleEmail, setGoogleEmail] = React.useState('rimonmajumder67@gmail.com');
-  const [googleName, setGoogleName] = React.useState('রিমন্ড মজুমদার');
+  const [googleEmail, setGoogleEmail] = React.useState('admin@aponbazar.com');
+  const [googleName, setGoogleName] = React.useState('অ্যাডমিন (Admin)');
   const otpRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   // Timer countdown for OTP
@@ -69,12 +69,12 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
 
     // Custom simulated OTP: "123456" is verified
     if (fullCode === '123456' || fullCode === '654321' || phoneNumber.endsWith('77')) {
-      const isRimonAdmin = phoneNumber === '01711122233';
+      const isRimonAdmin = phoneNumber === '01711122233' || phoneNumber === '01700000000';
       const mockUser: User = {
-        id: `user-phone-${Date.now()}`,
-        name: isRimonAdmin ? 'রিমন্ড মজুমদার (Admin)' : `ব্যবহারকারী ${phoneNumber.slice(-4)}`,
-        email: isRimonAdmin ? 'rimonmajumder67@gmail.com' : `${phoneNumber}@market.bd`,
-        phone: phoneNumber,
+        id: isRimonAdmin ? 'user-1' : `user-phone-${Date.now()}`,
+        name: isRimonAdmin ? 'অ্যাডমিন (Admin)' : `ব্যবহারকারী ${phoneNumber.slice(-4)}`,
+        email: isRimonAdmin ? 'admin@aponbazar.com' : `${phoneNumber}@market.bd`,
+        phone: isRimonAdmin ? '01700000000' : phoneNumber,
         avatar: isRimonAdmin 
           ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop'
           : `https://api.dicebear.com/7.x/adventurer/svg?seed=${phoneNumber}`,
@@ -95,12 +95,13 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
       setErrorMsg('দয়া করে সঠিক ইমেইল আইডি লিখুন');
       return;
     }
-    const isAdminEmail = emailAddress.toLowerCase().trim() === 'rimonmajumder67@gmail.com';
+    const cleanEmail = emailAddress.toLowerCase().trim();
+    const isAdminEmail = cleanEmail === 'rimonmajumder67@gmail.com' || cleanEmail === 'admin@aponbazar.com';
     const mockUser: User = {
       id: isAdminEmail ? 'user-1' : `user-google-${Date.now()}`,
-      name: nameInput || 'গুগল ব্যবহারকারী',
-      email: emailAddress.toLowerCase().trim(),
-      phone: isAdminEmail ? '01711122233' : '01700000000',
+      name: isAdminEmail ? 'অ্যাডমিন (Admin)' : (nameInput || 'গুগল ব্যবহারকারী'),
+      email: isAdminEmail ? 'admin@aponbazar.com' : cleanEmail,
+      phone: isAdminEmail ? '01700000000' : '01700000000',
       avatar: isAdminEmail 
         ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop'
         : `https://api.dicebear.com/7.x/lorelei/svg?seed=${emailAddress}`,
@@ -170,14 +171,14 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
               </span>
               <div className="space-y-2">
                 <button 
-                  onClick={() => handleGoogleSignIn('rimonmajumder67@gmail.com', 'রিমন্ড মজুমদার')}
+                  onClick={() => handleGoogleSignIn('admin@aponbazar.com', 'অ্যাডমিন')}
                   className="flex w-full items-center justify-between text-left rounded-xl bg-white dark:bg-gray-800 border border-gray-100 hover:border-emerald-300 dark:border-gray-700 p-2 text-xs transition-all active:scale-98 cursor-pointer"
                 >
                   <div>
                     <span className="block font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1">
-                      রিমন্ড মজুমদার <ShieldCheck className="h-3.5 w-3.5 text-blue-500" />
+                      অ্যাডমিন (Admin) <ShieldCheck className="h-3.5 w-3.5 text-blue-500" />
                     </span>
-                    <span className="block text-gray-400">rimonmajumder67@gmail.com</span>
+                    <span className="block text-gray-400">admin@aponbazar.com</span>
                   </div>
                   <span className="rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 font-bold text-[10px]">
                     ADMIN ROLE
@@ -225,12 +226,12 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
                   value={googleEmail}
                   onChange={(e) => setGoogleEmail(e.target.value)}
                   className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm font-semibold text-gray-800 focus:border-emerald-500 focus:bg-white focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                  placeholder="যেমন: rimonmajumder67@gmail.com"
+                  placeholder="যেমন: admin@aponbazar.com"
                   required
                 />
               </div>
               <p className="text-[10px] text-gray-400">
-                অ্যাডমিন ড্যাশবোর্ড পরীক্ষা করতে ইমেইলটি <b>rimonmajumder67@gmail.com</b> রাখুন।
+                অ্যাডমিন ড্যাশবোর্ড পরীক্ষা করতে ইমেইলটি <b>admin@aponbazar.com</b> রাখুন।
               </p>
             </div>
 
@@ -241,7 +242,7 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
                 value={googleName}
                 onChange={(e) => setGoogleName(e.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-3 px-4 text-sm font-semibold text-gray-800 focus:border-emerald-500 focus:bg-white focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="যেমন: রিমন্ড মজুমদার"
+                placeholder="যেমন: অ্যাডমিন ইউজার"
                 required
               />
             </div>
@@ -279,12 +280,12 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="w-full border-none py-3 px-4 text-sm font-bold text-gray-800 focus:outline-hidden dark:text-white bg-transparent"
-                  placeholder="যেমন: 01711122233"
+                  placeholder="যেমন: 01700000000"
                   required
                 />
               </div>
               <p className="text-[10px] text-gray-400">
-                অ্যাডমিন ড্যাশবোর্ডের জন্য নাম্বারটি <b>01711122233</b> দিতে পারেন।
+                অ্যাডমিন ড্যাশবোর্ডের জন্য নাম্বারটি <b>01700000000</b> দিতে পারেন।
               </p>
             </div>
 
@@ -316,9 +317,21 @@ export default function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) 
               <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">
                 আমরা <b>+৮৮ {phoneNumber}</b> নাম্বারে ৬ ডিজিটের একটি কোড পাঠিয়েছি।
               </p>
-              <span className="text-[11px] font-bold text-emerald-600 mt-1 block">
-                [ ডেমো কোড: ১২৩৪৫৬ ]
-              </span>
+              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
+                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                  [ ডেমো কোড: ১২৩৪৫৬ ]
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpCode(['1', '2', '3', '4', '5', '6']);
+                    setErrorMsg('');
+                  }}
+                  className="rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 px-3 py-1 text-[10px] font-extrabold tracking-wide transition-all border border-amber-500/20 cursor-pointer active:scale-95"
+                >
+                  ⚡ ওটিপি অটো-ফিল করুন (Auto Fill)
+                </button>
+              </div>
             </div>
 
             {/* OTP Slots */}

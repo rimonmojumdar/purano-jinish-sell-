@@ -1,7 +1,7 @@
 import React from 'react';
 import { Send, Eye, ShoppingCart, ShieldCheck, Phone, CheckCheck } from 'lucide-react';
 import { Chat, ChatMessage, Product, User } from '../types';
-import { getBotResponse } from '../data';
+import { getBotResponse, getFallbackImage } from '../data';
 
 interface ChatSystemProps {
   currentUser: User | null;
@@ -128,7 +128,16 @@ export default function ChatSystem({
 
                     {/* Linked product thumbnail */}
                     <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 p-1.5 dark:bg-gray-800">
-                      <img src={chat.productImage} alt={chat.productTitle} className="h-5 w-6 rounded-md object-cover" />
+                      <img 
+                        src={chat.productImage} 
+                        alt={chat.productTitle} 
+                        className="h-5 w-6 rounded-md object-cover" 
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = getFallbackImage('other');
+                        }}
+                      />
                       <span className="text-[10px] text-gray-400 truncate max-w-[120px] font-semibold">
                         {chat.productTitle}
                       </span>
@@ -176,7 +185,16 @@ export default function ChatSystem({
                 onClick={() => onViewProductDetails(activeChat.productId)}
                 className="flex items-center gap-2 rounded-xl bg-gray-50 hover:bg-gray-100 p-2 border border-gray-100 dark:bg-gray-800 dark:border-gray-700 text-left transition-all max-w-[200px]"
               >
-                <img src={activeChat.productImage} alt={activeChat.productTitle} className="h-8 w-10 rounded-lg object-cover" />
+                <img 
+                  src={activeChat.productImage} 
+                  alt={activeChat.productTitle} 
+                  className="h-8 w-10 rounded-lg object-cover" 
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = getFallbackImage('other');
+                  }}
+                />
                 <div className="min-w-0">
                   <span className="block text-[10px] font-bold text-gray-800 dark:text-gray-200 truncate leading-snug">
                     {activeChat.productTitle}

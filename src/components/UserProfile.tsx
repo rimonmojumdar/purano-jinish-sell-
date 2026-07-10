@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Product, WalletTransaction } from '../types';
+import { getFallbackImage } from '../data';
 import { 
   ShieldCheck, Wallet, Plus, AlertCircle, Trash2, Eye, ShieldAlert, 
   CheckCircle, FileText, Smartphone, Fingerprint, Coins, Heart,
@@ -515,7 +516,16 @@ export default function UserProfile({
                         onClick={() => onNavigateDetails(prod)}
                         className="flex items-center gap-3 text-left focus:outline-hidden min-w-0 flex-1"
                       >
-                        <img src={prod.imageUrls[0]} alt={prod.title} className="h-12 w-14 rounded-lg object-cover flex-shrink-0" />
+                        <img 
+                          src={prod.imageUrls[0]} 
+                          alt={prod.title} 
+                          className="h-12 w-14 rounded-lg object-cover flex-shrink-0" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = getFallbackImage(prod.category);
+                          }}
+                        />
                         <div className="min-w-0">
                           <h4 className="font-bold text-xs text-gray-900 dark:text-white line-clamp-1 hover:text-emerald-600 transition-colors">
                             {prod.title}
@@ -593,7 +603,16 @@ export default function UserProfile({
                         onClick={() => onNavigateDetails(prod)}
                         className="flex items-center gap-3 text-left focus:outline-hidden min-w-0"
                       >
-                        <img src={prod.imageUrls[0]} alt={prod.title} className="h-12 w-14 rounded-lg object-cover flex-shrink-0" />
+                        <img 
+                          src={prod.imageUrls[0]} 
+                          alt={prod.title} 
+                          className="h-12 w-14 rounded-lg object-cover flex-shrink-0" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = getFallbackImage(prod.category);
+                          }}
+                        />
                         <div className="min-w-0">
                           <h4 className="font-bold text-xs text-gray-900 dark:text-white line-clamp-1 hover:text-emerald-600 transition-colors">
                             {prod.title}

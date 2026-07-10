@@ -5,6 +5,7 @@ import {
   Star, Share2, Link2, Check, Tag
 } from 'lucide-react';
 import { Product, User } from '../types';
+import { getFallbackImage } from '../data';
 
 interface ProductDetailsProps {
   product: Product;
@@ -127,6 +128,11 @@ export default function ProductDetails({
               alt={product.title} 
               className="h-full w-full object-cover transition-all"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = getFallbackImage(product.category);
+              }}
             />
             {product.isFeatured && (
               <span className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1.5 text-xs font-extrabold text-white shadow-md">
@@ -149,7 +155,16 @@ export default function ProductDetails({
                       : 'border-gray-100 hover:border-emerald-200'
                   }`}
                 >
-                  <img src={url} alt={`product-thumb-${index}`} className="h-full w-full object-cover" />
+                  <img 
+                    src={url} 
+                    alt={`product-thumb-${index}`} 
+                    className="h-full w-full object-cover" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = getFallbackImage(product.category);
+                    }}
+                  />
                 </button>
               ))}
             </div>

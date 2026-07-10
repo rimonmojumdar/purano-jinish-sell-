@@ -5,6 +5,7 @@ import {
   Lock, Unlock, Settings, RefreshCw, Send, FileText, Sparkles
 } from 'lucide-react';
 import { Product, User } from '../types';
+import { getFallbackImage } from '../data';
 
 interface AdminPanelProps {
   products: Product[];
@@ -463,7 +464,16 @@ export default function AdminPanel({
                     <tr key={prod.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <img src={prod.imageUrls[0]} alt={prod.title} className="h-10 w-12 rounded-lg object-cover" />
+                          <img 
+                            src={prod.imageUrls[0]} 
+                            alt={prod.title} 
+                            className="h-10 w-12 rounded-lg object-cover" 
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = getFallbackImage(prod.category);
+                            }}
+                          />
                           <div className="max-w-[220px]">
                             <span className="font-bold text-gray-800 dark:text-gray-200 line-clamp-1">{prod.title}</span>
                             <span className="text-[10px] text-gray-400 block">{prod.location} • {prod.usedDuration} ব্যবহৃত</span>

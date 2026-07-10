@@ -206,7 +206,7 @@ export default function AddListing({ currentUser, onAddProduct, onNavigateHome }
         <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
           {autoApproved 
             ? 'আপনার বিজ্ঞাপনটি সফলভাবে আপনবাজারে লাইভ করা হয়েছে।' 
-            : 'আপনার বিজ্ঞাপনটি মডারেশনের জন্য পাঠানো হয়েছে। এটি এডমিন প্যানেলে অনুমোদিত হওয়ার সাথে সাথেই হোমপেজে প্রদর্শিত হবে। দ্রুত অনুমোদন দেখতে এডমিন ইমেইল (rimonmajumder67@gmail.com) দিয়ে লগইন করে ড্যাশবোর্ড থেকে Approve করতে পারেন।'}
+            : 'আপনার বিজ্ঞাপনটি মডারেশনের জন্য পাঠানো হয়েছে। এটি এডমিন প্যানেলে অনুমোদিত হওয়ার সাথে সাথেই হোমপেজে প্রদর্শিত হবে। দ্রুত অনুমোদন দেখতে এডমিন ইমেইল (admin@aponbazar.com) দিয়ে লগইন করে ড্যাশবোর্ড থেকে Approve করতে পারেন।'}
         </p>
         <button
           onClick={onNavigateHome}
@@ -555,7 +555,7 @@ export default function AddListing({ currentUser, onAddProduct, onNavigateHome }
               <div>
                 <span className="font-bold block mb-0.5">মডারেশন নোটিশ</span>
                 <p className="leading-relaxed">
-                  নিরাপত্তার স্বার্থে আপনার বিজ্ঞাপনটি আপলোড হওয়ার পর <b>Admin Approval</b> এর জন্য যাবে। অ্যাডমিন অনুমোদন দিলেই পণ্যটি সবার ফোনে দেখতে পাওয়া যাবে। আপনি ইমেইলটি <b>rimonmajumder67@gmail.com</b> দিয়ে সাইন-ইন করে নিজেই এটি অনুমোদন করতে পারবেন।
+                  নিরাপত্তার স্বার্থে আপনার বিজ্ঞাপনটি আপলোড হওয়ার পর <b>Admin Approval</b> এর জন্য যাবে। অ্যাডমিন অনুমোদন দিলেই পণ্যটি সবার ফোনে দেখতে পাওয়া যাবে। আপনি ইমেইলটি <b>admin@aponbazar.com</b> দিয়ে সাইন-ইন করে নিজেই এটি অনুমোদন করতে পারবেন।
                 </p>
               </div>
             </div>
