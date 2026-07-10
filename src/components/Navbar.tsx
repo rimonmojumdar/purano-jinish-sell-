@@ -63,7 +63,7 @@ export default function Navbar({
                 <span className="block text-lg font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-xl">
                   আপন<span className="text-emerald-600">বাজার</span>
                 </span>
-                <span className="block text-[9px] tracking-wider text-gray-400 uppercase font-bold">
+                <span className="hidden sm:block text-[9px] tracking-wider text-gray-400 uppercase font-bold">
                   Old Product Marketplace
                 </span>
               </div>
@@ -334,7 +334,7 @@ export default function Navbar({
             )}
 
             {currentUser && (
-              <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                 <Wallet className="h-3 w-3" />
                 <span>৳{currentUser.balance}</span>
               </div>
@@ -357,8 +357,10 @@ export default function Navbar({
           <div className="space-y-1 pt-2 pb-3">
             <button
               onClick={() => { onNavigate('home'); setIsMobileMenuOpen(false); }}
-              className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium ${
-                currentView === 'home' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:bg-gray-50'
+              className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium transition-colors ${
+                currentView === 'home' 
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
               }`}
             >
               হোম পেজ
@@ -367,8 +369,10 @@ export default function Navbar({
               <>
                 <button
                   onClick={() => { onNavigate('chat'); setIsMobileMenuOpen(false); }}
-                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium ${
-                    currentView === 'chat' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:bg-gray-50'
+                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium transition-colors ${
+                    currentView === 'chat' 
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                 >
                   <MessageSquare className="mr-2 h-5 w-5 text-gray-500" />
@@ -376,8 +380,10 @@ export default function Navbar({
                 </button>
                 <button
                   onClick={() => { onNavigate('upload'); setIsMobileMenuOpen(false); }}
-                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium ${
-                    currentView === 'upload' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:bg-gray-50'
+                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium transition-colors ${
+                    currentView === 'upload' 
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                 >
                   <PlusCircle className="mr-2 h-5 w-5 text-gray-500" />
@@ -385,8 +391,10 @@ export default function Navbar({
                 </button>
                 <button
                   onClick={() => { onNavigate('profile'); setIsMobileMenuOpen(false); }}
-                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium ${
-                    currentView === 'profile' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:bg-gray-50'
+                  className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-medium transition-colors ${
+                    currentView === 'profile' 
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                 >
                   <User className="mr-2 h-5 w-5 text-gray-500" />
@@ -395,8 +403,10 @@ export default function Navbar({
                 {currentUser.role === 'admin' && (
                   <button
                     onClick={() => { onNavigate('admin'); setIsMobileMenuOpen(false); }}
-                    className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-semibold text-red-600 ${
-                      currentView === 'admin' ? 'bg-red-50' : 'hover:bg-red-50/50'
+                    className={`flex w-full items-center rounded-lg px-3 py-2.5 text-base font-semibold transition-colors ${
+                      currentView === 'admin' 
+                        ? 'bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400' 
+                        : 'text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-950/10'
                     }`}
                   >
                     <ShieldAlert className="mr-2 h-5 w-5 text-red-500" />
@@ -410,16 +420,22 @@ export default function Navbar({
           <div className="border-t border-gray-100 pt-4 pb-2 dark:border-gray-800">
             {currentUser ? (
               <div className="space-y-2">
-                <div className="flex items-center gap-3 px-3">
-                  <img src={currentUser.avatar} alt={currentUser.name} className="h-10 w-10 rounded-full" />
-                  <div>
-                    <div className="text-base font-bold text-gray-800 dark:text-gray-200">{currentUser.name}</div>
-                    <div className="text-xs text-gray-400">{currentUser.email}</div>
+                <div className="flex items-center justify-between gap-3 px-3">
+                  <div className="flex items-center gap-3">
+                    <img src={currentUser.avatar} alt={currentUser.name} className="h-10 w-10 rounded-full object-cover" />
+                    <div>
+                      <div className="text-base font-bold text-gray-800 dark:text-gray-200">{currentUser.name}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500">{currentUser.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 shrink-0">
+                    <Wallet className="h-3.5 w-3.5" />
+                    <span>৳{currentUser.balance}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => { onLogout(); setIsMobileMenuOpen(false); }}
-                  className="flex w-full items-center rounded-lg px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50"
+                  className="flex w-full items-center rounded-lg px-3 py-2 text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
                 >
                   <LogOut className="mr-2 h-5 w-5" />
                   লগআউট করুন
@@ -428,7 +444,7 @@ export default function Navbar({
             ) : (
               <button
                 onClick={() => { onOpenLogin(); setIsMobileMenuOpen(false); }}
-                className="flex w-full items-center justify-center rounded-xl bg-gray-950 py-3 text-center text-sm font-semibold text-white shadow-xs"
+                className="flex w-full items-center justify-center rounded-xl bg-gray-950 hover:bg-gray-900 py-3 text-center text-sm font-semibold text-white shadow-xs dark:bg-white dark:text-gray-950 dark:hover:bg-gray-100 transition-colors"
               >
                 লগইন / সাইন-আপ করুন
               </button>

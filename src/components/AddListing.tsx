@@ -1,5 +1,5 @@
 import React from 'react';
-import { UploadCloud, CheckCircle, Smartphone, Laptop, Tv, X, AlertCircle } from 'lucide-react';
+import { UploadCloud, CheckCircle, Smartphone, Laptop, Tv, X, AlertCircle, Sparkles } from 'lucide-react';
 import { CATEGORIES, LOCATIONS } from '../data';
 import { Product, User } from '../types';
 
@@ -64,6 +64,54 @@ export default function AddListing({ currentUser, onAddProduct, onNavigateHome }
   const [origPrice, setOrigPrice] = React.useState('');
   const [durationMonths, setDurationMonths] = React.useState('6');
   const [estimatorOpen, setEstimatorOpen] = React.useState(false);
+
+  // AI Description state
+  const [generatingAi, setGeneratingAi] = React.useState(false);
+  const [aiError, setAiError] = React.useState('');
+  const [aiSuccess, setAiSuccess] = React.useState(false);
+
+  const handleGenerateAiDescription = async () => {
+    if (!title) {
+      alert('দয়া করে প্রথমে বিজ্ঞাপনের টাইটেলটি লিখুন।');
+      return;
+    }
+    setGeneratingAi(true);
+    setAiError('');
+    setAiSuccess(false);
+
+    try {
+      const response = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          category,
+          condition,
+          usedDuration: usedDuration || '৬ মাস'
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Gemini API call failed');
+      }
+
+      const data = await response.json();
+      if (data.description) {
+        setDescription(data.description);
+        setAiSuccess(true);
+      } else {
+        throw new Error('কোনো বিবরণী পাওয়া যায়নি।');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setAiError(err.message || 'বিবরণী তৈরিতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+    } finally {
+      setGeneratingAi(false);
+    }
+  };
 
   // Auto pick first pre-curated image when category changes
   React.useEffect(() => {
@@ -457,13 +505,45 @@ export default function AddListing({ currentUser, onAddProduct, onNavigateHome }
 
           {/* Description */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300">পণ্যের বিবরণ (Description) <span className="text-red-500">*</span></label>
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-1.5">
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                পণ্যের বিবরণ (Description) <span className="text-red-500">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleGenerateAiDescription}
+                disabled={generatingAi}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-extrabold transition-all duration-200 cursor-pointer active:scale-95 ${
+                  generatingAi
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 animate-pulse'
+                    : title
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs'
+                    : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'
+                }`}
+                title={title ? "Gemini AI দিয়ে আকর্ষণীয় বিবরণী তৈরি করুন" : "আগে টাইটেল লিখুন"}
+              >
+                <Sparkles className={`h-3.5 w-3.5 ${generatingAi ? 'animate-spin' : ''}`} />
+                {generatingAi ? 'এআই বিবরণী লিখছে... 🤖' : 'এআই বিবরণী লিখুন (AI Writer)'}
+              </button>
+            </div>
+
+            {aiError && (
+              <div className="text-[10px] text-red-600 dark:text-red-400 font-bold bg-red-500/10 rounded-xl py-2 px-3 mb-2 animate-in fade-in">
+                ⚠️ {aiError}
+              </div>
+            )}
+            {aiSuccess && (
+              <div className="text-[10px] text-purple-700 dark:text-purple-400 font-extrabold bg-purple-500/10 rounded-xl py-2 px-3 mb-2 animate-in fade-in">
+                ✨ Gemini AI আপনার টাইটেল ও তথ্য বিশ্লেষণ করে চমৎকার বিবরণী লিখে দিয়েছে!
+              </div>
+            )}
+
             <textarea
               required
-              rows={4}
+              rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="পণ্যটির অবস্থা, কোনো সমস্যা আছে কি না, বা কেন বিক্রি করছেন ইত্যাদি বিস্তারিতভাবে লিখুন..."
+              placeholder="পণ্যটির অবস্থা, কোনো সমস্যা আছে কি না, বা কেন বিক্রি করছেন ইত্যাদি বিস্তারিতভাবে লিখুন অথবা উপরের 'এআই বিবরণী লিখুন' বাটনে ক্লিক করুন..."
               className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-3 px-4 text-sm font-semibold text-gray-800 focus:border-emerald-500 focus:bg-white focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
